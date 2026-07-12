@@ -77,7 +77,7 @@ export default function Dashboard() {
     );
   }
 
-  if (!data) return null;
+  if (user?.role !== 'FINANCIAL_ANALYST' && !data) return null;
 
   // Dispatch layout view depending on the user's role
   switch (user.role) {
@@ -107,7 +107,7 @@ export default function Dashboard() {
       );
     }
     case 'FINANCIAL_ANALYST':
-      return <FinancialAnalystDashboard kpis={data.kpis} breakdown={data.expenseBreakdown} roiData={data.vehicleROI} />;
+      return <FinancialDashboard />;
     default:
       return (
         <div style={{ padding: 24 }}>
