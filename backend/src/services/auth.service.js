@@ -12,6 +12,8 @@ const login = async (email, password, meta = {}) => {
     where: { email: normalizedEmail },
   });
 
+  console.log(`[LOGIN ATTEMPT] Email: "${email}", Normalized: "${normalizedEmail}", Found: ${!!user}`);
+
   if (!user) {
     // Log failed login attempt for non-existent user
     await auditService.logAction({
@@ -23,7 +25,7 @@ const login = async (email, password, meta = {}) => {
       userAgent: meta.userAgent,
       status: 'FAILURE'
     });
-    throw new ApiError(401, 'Invalid credentials. Account locked after 5 failed attempts.');
+    throw new ApiError(401, 'Invalid email or password. Account will be locked after 5 failed attempts.');
   }
 
   if (!user.isActive) {
@@ -36,6 +38,7 @@ const login = async (email, password, meta = {}) => {
   }
 
   const isMatch = await bcrypt.compare(password, user.passwordHash);
+  console.log(`[LOGIN ATTEMPT] isMatch: ${isMatch} for password of length ${password.length}`);
   if (!isMatch) {
     const newAttempts = user.failedLoginAttempts + 1;
     if (newAttempts >= 5) {
@@ -75,7 +78,7 @@ const login = async (email, password, meta = {}) => {
         userAgent: meta.userAgent,
         status: 'FAILURE'
       });
-      throw new ApiError(401, 'Invalid credentials. Account locked after 5 failed attempts.');
+      throw new ApiError(401, 'Invalid email or password. Account will be locked after 5 failed attempts.');
     }
   }
 
