@@ -2,10 +2,12 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+  schemas   = ["public", "auth"]
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 enum Role {
@@ -14,6 +16,8 @@ enum Role {
   DRIVER
   SAFETY_OFFICER
   FINANCIAL_ANALYST
+
+  @@schema("public")
 }
 
 enum VehicleStatus {
@@ -23,6 +27,8 @@ enum VehicleStatus {
   retired
 
   @@map("vehicle_status")
+
+  @@schema("public")
 }
 
 enum DriverStatus {
@@ -32,6 +38,8 @@ enum DriverStatus {
   suspended
 
   @@map("driver_status")
+
+  @@schema("public")
 }
 
 enum TripStatus {
@@ -41,6 +49,8 @@ enum TripStatus {
   cancelled
 
   @@map("trip_status")
+
+  @@schema("public")
 }
 
 enum MaintenanceType {
@@ -48,6 +58,8 @@ enum MaintenanceType {
   reactive
 
   @@map("maintenance_type")
+
+  @@schema("public")
 }
 
 enum MaintenanceStatus {
@@ -55,6 +67,8 @@ enum MaintenanceStatus {
   closed
 
   @@map("maintenance_status")
+
+  @@schema("public")
 }
 
 enum ExpenseCategory {
@@ -63,6 +77,8 @@ enum ExpenseCategory {
   other
 
   @@map("expense_category")
+
+  @@schema("public")
 }
 
 model User {
@@ -78,6 +94,8 @@ model User {
   updatedAt           DateTime  @updatedAt @map("updatedAt")
 
   @@map("users")
+
+  @@schema("public")
 }
 
 model Vehicle {
@@ -100,6 +118,8 @@ model Vehicle {
   expenses                 Expense[]
 
   @@map("vehicles")
+
+  @@schema("public")
 }
 
 model Driver {
@@ -115,8 +135,11 @@ model Driver {
   createdAt        DateTime     @default(now()) @map("created_at")
   updatedAt        DateTime     @updatedAt @map("updated_at")
   trips            Trip[]
+  safetyScoreHistory SafetyScoreHistory[]
 
   @@map("drivers")
+
+  @@schema("public")
 }
 
 model Trip {
@@ -143,6 +166,8 @@ model Trip {
   expenses               Expense[]
 
   @@map("trips")
+
+  @@schema("public")
 }
 
 model MaintenanceRecord {
@@ -158,6 +183,8 @@ model MaintenanceRecord {
   vehicle     Vehicle           @relation(fields: [vehicleId], references: [id])
 
   @@map("maintenance_records")
+
+  @@schema("public")
 }
 
 model Expense {
@@ -175,4 +202,23 @@ model Expense {
   trip        Trip?           @relation(fields: [tripId], references: [id])
 
   @@map("expenses")
+
+  @@schema("public")
 }
+
+model SafetyScoreHistory {
+  id           String   @id @default(uuid())
+  driverId     String   @map("driver_id")
+  score        Decimal  @map("score")
+  delta        Decimal  @map("delta")
+  eventCode    String   @map("event_code")
+  description  String   @map("description")
+  tripId       String?  @map("trip_id")
+  recordedAt   DateTime @default(now()) @map("recorded_at")
+  driver       Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@map("safety_score_history")
+
+  @@schema("public")
+}
+
