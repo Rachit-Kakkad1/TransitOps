@@ -474,6 +474,11 @@
   gap: 14px; /* Increased grid spacing */
 }
 
+/* Symmetrical alignment: when there is an odd number of cards, make the last one span full width */
+.demo-card:last-child:nth-child(odd) {
+  grid-column: span 2;
+}
+
 .demo-card {
   position: relative;
   display: flex;
