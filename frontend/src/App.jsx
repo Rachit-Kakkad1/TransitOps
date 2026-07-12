@@ -3,6 +3,10 @@ import { AuthProvider } from './context/AuthContext';
 import LoginPage from './pages/Login/LoginPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import Dashboard from './pages/Dashboard/Dashboard';
+import Vehicles from './pages/Vehicles/Vehicles';
+import Trips from './pages/Trips/Trips';
+import Maintenance from './pages/Maintenance/Maintenance';
+import Drivers from './pages/Drivers/Drivers';
 
 function App() {
   return (
@@ -16,10 +20,10 @@ function App() {
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             {/* Fallback to dashboard for other sub-routes in shell */}
-            <Route path="/vehicles" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/trips" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/maintenance" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/drivers" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/vehicles" element={<Vehicles />} />
+            <Route path="/trips" element={<Trips />} />
+            <Route path="/maintenance" element={<Maintenance />} />
+            <Route path="/drivers" element={<Drivers />} />
             <Route path="/analytics" element={<Navigate to="/dashboard" replace />} />
           </Route>
 

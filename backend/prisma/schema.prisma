@@ -46,6 +46,7 @@ enum TripStatus {
 enum MaintenanceType {
   preventive
   reactive
+  predicted
 
   @@map("maintenance_type")
 }
