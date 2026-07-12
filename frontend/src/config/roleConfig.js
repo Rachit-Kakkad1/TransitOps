@@ -51,7 +51,9 @@ const roleConfig = {
     title: DISPLAY_NAMES[ROLES.FINANCIAL_ANALYST],
     sidebarItems: [
       { path: '/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
-      { path: '/analytics', label: 'Expenses & ROI', icon: 'DollarSign' }
+      { path: '/fleet-roi', label: 'Fleet ROI', icon: 'TrendingUp' },
+      { path: '/expenses', label: 'Expenses', icon: 'Receipt' },
+      { path: '/reports', label: 'Reports & Alerts', icon: 'FileBarChart' }
     ]
   }
 };

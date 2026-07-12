@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Truck, Navigation, Wrench, Users, DollarSign, 
-  LogOut, PanelLeftClose, PanelLeftOpen 
+  LogOut, PanelLeftClose, PanelLeftOpen, TrendingUp, Receipt, FileBarChart 
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getRoleConfig, getRoleTitle } from '../../config/roleConfig';
@@ -13,7 +13,10 @@ const IconMap = {
   Navigation,
   Wrench,
   Users,
-  DollarSign
+  DollarSign,
+  TrendingUp,
+  Receipt,
+  FileBarChart
 };
 
 const COLLAPSED_KEY = 'transitops-sidebar-collapsed';

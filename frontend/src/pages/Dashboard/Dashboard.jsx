@@ -10,6 +10,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import StatCard from '../../components/ui/StatCard';
 import StatusChip from '../../components/ui/StatusChip';
+import FinancialDashboard from './FinancialDashboard';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -21,6 +22,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function fetchDashboardData() {
+      // For FINANCIAL_ANALYST, we load everything inside FinancialDashboard component itself
+      if (user?.role === 'FINANCIAL_ANALYST') {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setError('');
       try {
@@ -72,7 +78,7 @@ export default function Dashboard() {
     );
   }
 
-  if (!data) return null;
+  if (user?.role !== 'FINANCIAL_ANALYST' && !data) return null;
 
   // Dispatch layout view depending on the user's role
   switch (user.role) {
@@ -85,7 +91,7 @@ export default function Dashboard() {
     case 'SAFETY_OFFICER':
       return <SafetyOfficerDashboard kpis={data.kpis} distribution={data.safetyDistribution} alertingDrivers={data.alertingDrivers} />;
     case 'FINANCIAL_ANALYST':
-      return <FinancialAnalystDashboard kpis={data.kpis} breakdown={data.expenseBreakdown} roiData={data.vehicleROI} />;
+      return <FinancialDashboard />;
     default:
       return (
         <div style={{ padding: 24 }}>
