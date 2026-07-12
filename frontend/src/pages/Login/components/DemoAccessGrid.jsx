@@ -1,7 +1,15 @@
 import { useState } from 'react';
-import { User, Radio, Shield, ChartPie, Truck, Copy, Check } from 'lucide-react';
+import { User, Radio, Shield, ChartPie, Truck, Settings, Copy, Check } from 'lucide-react';
 
 const DEMO_ACCOUNTS = [
+  {
+    id: 'admin',
+    role: 'System Admin',
+    email: 'admin@transitops.app',
+    password: 'password123',
+    icon: Settings,
+    color: '#E53935', // Premium red
+  },
   {
     id: 'manager',
     role: 'Fleet Manager',
@@ -90,14 +98,26 @@ export default function DemoAccessGrid({ selectedEmail, onSelectAccount }) {
                 }
               }}
             >
+              {/* Copy Button (absolute top-right) */}
+              <button
+                className={`copy-button-subtle ${isCopied ? 'copied' : ''}`}
+                onClick={(e) => handleCopy(e, account.email, account.id)}
+                title="Copy email address"
+                aria-label={`Copy email for ${account.role}`}
+              >
+                {isCopied ? <Check size={12} /> : <Copy size={12} />}
+              </button>
+
               {/* Card Left: Outline Icon */}
               <div className="demo-card-icon-container">
                 <Icon size={18} strokeWidth={1.5} style={{ color: account.color }} />
               </div>
 
-              {/* Card Center: Role Title */}
+              {/* Card Center: Details */}
               <div className="demo-card-details">
                 <span className="demo-card-role">{account.role}</span>
+                <span className="demo-card-email">{account.email}</span>
+                <span className="use-account-badge">USE ACCOUNT</span>
               </div>
             </div>
           );

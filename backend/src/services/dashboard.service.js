@@ -6,6 +6,8 @@ const safetyService = require('./safety.service');
  */
 const getOverviewData = async (userId, role) => {
   switch (role) {
+    case 'ADMIN':
+      return getAdminData();
     case 'FLEET_MANAGER':
       return getFleetManagerData();
     case 'DISPATCHER':
@@ -430,6 +432,98 @@ async function getFinancialAnalystData() {
     },
     expenseBreakdown,
     vehicleROI
+  };
+}
+
+/**
+ * ADMIN DASHBOARD DATA
+ */
+async function getAdminData() {
+  const [totalUsers, totalVehicles, totalDrivers, totalTrips, lockedUsersCount, inactiveUsersCount] = await Promise.all([
+    prisma.user.count(),
+    prisma.vehicle.count(),
+    prisma.driver.count(),
+    prisma.trip.count(),
+    prisma.user.count({ where: { lockedUntil: { gt: new Date() } } }),
+    prisma.user.count({ where: { isActive: false } })
+  ]);
+
+  const recentUsers = await prisma.user.findMany({
+    take: 10,
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      isActive: true,
+      failedLoginAttempts: true,
+      lockedUntil: true
+    }
+  });
+
+  const [recentTrips, recentMaintenance] = await Promise.all([
+    prisma.trip.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        vehicle: { select: { registrationNumber: true } },
+        driver: { select: { fullName: true } }
+      }
+    }),
+    prisma.maintenanceRecord.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        vehicle: { select: { registrationNumber: true } }
+      }
+    })
+  ]);
+
+  const systemActivity = [];
+
+  for (const t of recentTrips) {
+    systemActivity.push({
+      id: t.id,
+      type: 'TRIP',
+      description: `Trip dispatched: ${t.source} → ${t.destination}`,
+      details: `Vehicle: ${t.vehicle.registrationNumber} · Driver: ${t.driver.fullName}`,
+      timestamp: t.createdAt
+    });
+  }
+
+  for (const m of recentMaintenance) {
+    systemActivity.push({
+      id: m.id,
+      type: 'MAINTENANCE',
+      description: `Maintenance logged: ${m.description}`,
+      details: `Vehicle: ${m.vehicle.registrationNumber} · Type: ${m.type}`,
+      timestamp: m.createdAt
+    });
+  }
+
+  // Sort combined activity by timestamp descending
+  systemActivity.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  return {
+    kpis: {
+      totalUsers,
+      totalVehicles,
+      totalDrivers,
+      totalTrips,
+      lockedUsers: lockedUsersCount,
+      inactiveUsers: inactiveUsersCount
+    },
+    recentUsers: recentUsers.map(u => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      isActive: u.isActive,
+      failedAttempts: u.failedLoginAttempts,
+      lockedUntil: u.lockedUntil
+    })),
+    systemActivity: systemActivity.slice(0, 5)
   };
 }
 
