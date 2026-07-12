@@ -35,6 +35,11 @@ const authenticate = asyncHandler(async (req, res, next) => {
     throw new ApiError(401, 'User account is inactive');
   }
 
+  // Check if account is locked
+  if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
+    throw new ApiError(401, 'Account is locked. Please try again later.');
+  }
+
   // Attach safe user object to request
   req.user = {
     id: user.id,
@@ -43,6 +48,10 @@ const authenticate = asyncHandler(async (req, res, next) => {
     role: user.role,
     isActive: user.isActive,
   };
+
+  // Attach client metadata for audit logging
+  req.clientIp = req.ip || req.headers['x-forwarded-for'] || req.connection?.remoteAddress || 'unknown';
+  req.clientUserAgent = req.headers['user-agent'] || 'unknown';
 
   next();
 });

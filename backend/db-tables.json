@@ -1,0 +1,25 @@
+{
+  "tables": [
+    {
+      "table_schema": "public",
+      "table_name": "users",
+      "table_type": "VIEW"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "profiles",
+      "table_type": "BASE TABLE"
+    },
+    {
+      "table_schema": "auth",
+      "table_name": "users",
+      "table_type": "BASE TABLE"
+    },
+    {
+      "table_schema": "transitops",
+      "table_name": "users",
+      "table_type": "BASE TABLE"
+    }
+  ],
+  "error": null
+}

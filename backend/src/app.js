@@ -14,6 +14,8 @@ const vehicleRoutes = require('./routes/vehicle.routes');
 const tripRoutes = require('./routes/trip.routes');
 const maintenanceRoutes = require('./routes/maintenance.routes');
 const driverRoutes = require('./routes/driver.routes');
+const adminRoutes = require('./routes/admin.routes');
+const safetyRoutes = require('./routes/safety.routes');
 
 const app = express();
 
@@ -44,6 +46,8 @@ app.use('/api', vehicleRoutes);
 app.use('/api', tripRoutes);
 app.use('/api', maintenanceRoutes);
 app.use('/api', driverRoutes);
+app.use('/api', adminRoutes);
+app.use('/api', safetyRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

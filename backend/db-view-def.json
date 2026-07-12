@@ -1,0 +1,4 @@
+{
+  "viewDef": " SELECT p.id,\n    p.full_name AS name,\n    u.email,\n    u.encrypted_password AS \"passwordHash\",\n        CASE\n            WHEN p.role::text = 'fleet_manager'::text THEN 'FLEET_MANAGER'::text\n            WHEN p.role::text = 'dispatcher'::text THEN 'DISPATCHER'::text\n            WHEN p.role::text = 'safety_officer'::text THEN 'SAFETY_OFFICER'::text\n            WHEN p.role::text = 'financial_analyst'::text THEN 'FINANCIAL_ANALYST'::text\n            WHEN p.role::text = 'driver'::text THEN 'DRIVER'::text\n            ELSE upper(p.role::text)\n        END AS role,\n    true AS \"isActive\",\n    p.locked_until AS \"lockedUntil\",\n    p.failed_login_attempts AS \"failedLoginAttempts\",\n    p.created_at AS \"createdAt\",\n    p.created_at AS \"updatedAt\"\n   FROM profiles p\n     JOIN auth.users u ON p.id = u.id;",
+  "error": null
+}
