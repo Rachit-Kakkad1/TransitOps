@@ -7,43 +7,46 @@ import {
   Truck, Wrench, Navigation, DollarSign, Users, AlertTriangle, 
   CheckCircle2, Clock, Calendar, BarChart3, Zap, Shield, FileText
 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import StatCard from '../../components/ui/StatCard';
 import StatusChip from '../../components/ui/StatusChip';
+import SafetyOfficerDashboard from './SafetyOfficerDashboard';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const location = useLocation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    async function fetchDashboardData() {
-      setLoading(true);
-      setError('');
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/api/dashboard/overview`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const resData = await response.json();
-        if (!response.ok) {
-          throw new Error(resData.message || 'Failed to fetch dashboard data.');
+  const fetchDashboardData = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    setError('');
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/dashboard/overview`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
+      });
 
-        setData(resData.data);
-      } catch (err) {
-        setError(err.message || 'An unexpected network error occurred.');
-      } finally {
-        setLoading(false);
+      const resData = await response.json();
+      if (!response.ok) {
+        throw new Error(resData.message || 'Failed to fetch dashboard data.');
       }
-    }
 
+      setData(resData.data);
+    } catch (err) {
+      setError(err.message || 'An unexpected network error occurred.');
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     if (user) {
       fetchDashboardData();
     }
@@ -82,8 +85,23 @@ export default function Dashboard() {
       return <DispatcherDashboard kpis={data.kpis} pendingTrips={data.pendingTrips} activeTrips={data.activeTrips} vehicles={data.availableVehicles} drivers={data.availableDrivers} />;
     case 'DRIVER':
       return <DriverDashboard driver={data.driver} activeTrip={data.activeTrip} upcomingTrips={data.upcomingTrips} errorMsg={data.error} />;
-    case 'SAFETY_OFFICER':
-      return <SafetyOfficerDashboard kpis={data.kpis} distribution={data.safetyDistribution} alertingDrivers={data.alertingDrivers} />;
+    case 'SAFETY_OFFICER': {
+      let tab = 'overview';
+      if (location.pathname === '/drivers') {
+        tab = 'drivers';
+      } else if (location.pathname === '/trips') {
+        tab = 'trips';
+      }
+      return (
+        <SafetyOfficerDashboard 
+          kpis={data.kpis} 
+          distribution={data.safetyDistribution} 
+          alertingDrivers={data.alertingDrivers} 
+          onRefresh={() => fetchDashboardData(false)} 
+          initialTab={tab} 
+        />
+      );
+    }
     case 'FINANCIAL_ANALYST':
       return <FinancialAnalystDashboard kpis={data.kpis} breakdown={data.expenseBreakdown} roiData={data.vehicleROI} />;
     default:
@@ -336,80 +354,6 @@ function DriverDashboard({ driver, activeTrip, upcomingTrips, errorMsg }) {
   );
 }
 
-/**
- * 4. SAFETY OFFICER DASHBOARD VIEW
- */
-function SafetyOfficerDashboard({ kpis, distribution, alertingDrivers }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      {/* Overview stats grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
-        <StatCard icon={Shield} label="Avg Safety Score" value={`${kpis.averageSafetyScore}%`} sub="Fleet overall score" />
-        <StatCard icon={AlertTriangle} label="Expired Licenses" value={kpis.expiredLicenses} sub="Immediate suspensions needed" />
-        <StatCard icon={Clock} label="Expiring Soon" value={kpis.expiringSoonLicenses} sub="Within 30 days window" />
-        <StatCard icon={Ban} label="Suspended Drivers" value={kpis.suspendedDrivers} sub="Currently off-duty" />
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-        {/* Compliance Distribution Pie/Donut Chart */}
-        <div className="card-premium">
-          <h3 style={{ margin: '0 0 16px 0', fontSize: '0.95rem', fontWeight: 800, color: '#0f172a' }}>Driver Safety Classification</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <ResponsiveContainer width={160} height={160}>
-              <PieChart>
-                <Pie
-                  data={distribution} dataKey="value" cx="50%" cy="50%"
-                  innerRadius={45} outerRadius={65} paddingAngle={2}
-                >
-                  {distribution.map((entry, idx) => (
-                    <Cell key={idx} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {distribution.map((entry, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.8rem' }}>
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: entry.color }} />
-                  <span style={{ color: '#475569', minWidth: 100 }}>{entry.name}</span>
-                  <span style={{ fontWeight: 700, color: '#0f172a' }}>{entry.value} drivers</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Compliance Alerts Panel */}
-        <div className="card-premium">
-          <h3 style={{ margin: '0 0 16px 0', fontSize: '0.95rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <AlertTriangle size={18} color="#ef4444" /> Urgent Compliance Alerts
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 180, overflowY: 'auto' }}>
-            {alertingDrivers.length > 0 ? alertingDrivers.map((a, idx) => (
-              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 8, borderBottom: '1px solid #f1f5f9' }}>
-                <div>
-                  <p style={{ margin: '0 0 2px 0', fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>{a.name}</p>
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>{a.issue}</p>
-                </div>
-                <span style={{
-                  fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: 12,
-                  background: a.severity === 'CRITICAL' ? '#fee2e2' : '#fef3c7',
-                  color: a.severity === 'CRITICAL' ? '#991b1b' : '#92400e'
-                }}>
-                  {a.severity}
-                </span>
-              </div>
-            )) : (
-              <p style={{ fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center', padding: '20px 0' }}>All drivers compliant</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /**
  * 5. FINANCIAL ANALYST DASHBOARD VIEW

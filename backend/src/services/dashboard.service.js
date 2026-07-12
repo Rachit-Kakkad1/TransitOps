@@ -1,4 +1,5 @@
 const prisma = require('../config/db');
+const safetyService = require('./safety.service');
 
 /**
  * Returns role-specific dashboard metrics and datasets.
@@ -223,17 +224,26 @@ async function getSafetyOfficerData() {
   const now = new Date();
   const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-  const [drivers, totalSuspended] = await Promise.all([
-    prisma.driver.findMany({ select: { id: true, fullName: true, licenseExpiry: true, safetyScore: true, status: true } }),
-    prisma.driver.count({ where: { status: 'suspended' } })
+  const [drivers, evaluatedTrips] = await Promise.all([
+    prisma.driver.findMany({
+      include: {
+        trips: {
+          where: { status: 'dispatched' }
+        }
+      }
+    }),
+    safetyService.getTripsEligibility()
   ]);
 
   let expiredLicenses = 0;
   let expiringSoonLicenses = 0;
   let safetyScoreSum = 0;
+  let totalSuspended = 0;
+  
   let excellentCount = 0;
   let goodCount = 0;
   let atRiskCount = 0;
+  let criticalCount = 0;
 
   const alertingDrivers = [];
 
@@ -242,52 +252,75 @@ async function getSafetyOfficerData() {
     const score = parseFloat(d.safetyScore);
     safetyScoreSum += score;
 
-    // Safety classification
-    if (score >= 90) excellentCount++;
-    else if (score >= 80) goodCount++;
-    else atRiskCount++;
+    // Apply centralized risk intelligence
+    const riskResult = safetyService.calculateDriverRisk(d, d.trips);
+    d.riskScore = riskResult.riskScore;
+    d.riskLevel = riskResult.riskLevel;
+    d.reasons = riskResult.reasons;
 
-    // License checks
-    if (expiry < now) {
-      expiredLicenses++;
-      alertingDrivers.push({
-        id: d.id,
-        name: d.fullName,
-        issue: 'Expired Driver License',
-        expiryDate: d.licenseExpiry,
-        severity: 'CRITICAL'
-      });
-    } else if (expiry <= thirtyDaysFromNow) {
-      expiringSoonLicenses++;
-      alertingDrivers.push({
-        id: d.id,
-        name: d.fullName,
-        issue: 'License Expiring Soon',
-        expiryDate: d.licenseExpiry,
-        severity: 'WARNING'
-      });
+    // Safety classification stats
+    if (score >= safetyService.THRESHOLDS.EXCELLENT) excellentCount++;
+    else if (score >= safetyService.THRESHOLDS.GOOD) goodCount++;
+    else if (score >= safetyService.THRESHOLDS.HARD_ELIGIBILITY) atRiskCount++;
+    else criticalCount++;
+
+    if (d.status === 'suspended') {
+      totalSuspended++;
     }
 
-    // High risk flag
-    if (score < 75) {
-      alertingDrivers.push({
-        id: d.id,
-        name: d.fullName,
-        issue: `Critical Safety Score: ${score}`,
-        expiryDate: d.licenseExpiry,
-        severity: 'CRITICAL'
+    // Expiry classifications
+    if (expiry < now) {
+      expiredLicenses++;
+    } else if (expiry <= thirtyDaysFromNow) {
+      expiringSoonLicenses++;
+    }
+
+    // Add compliance alerts
+    if (d.reasons.length > 0) {
+      // Map reasons to a unified list
+      d.reasons.forEach(r => {
+        let recommendedAction = 'Review driver status';
+        if (r.code === 'LICENSE_EXPIRED') recommendedAction = 'Suspend from operations immediately';
+        else if (r.code === 'CRITICAL_SAFETY_SCORE') recommendedAction = 'Suspend and enroll in safety retraining';
+        else if (r.code === 'DRIVER_AVAILABLE_WITH_EXPIRED_LICENSE') recommendedAction = 'Re-toggle to SUSPENDED status';
+        else if (r.code === 'UNSAFE_ACTIVE_TRIP_EXPIRED_LICENSE') recommendedAction = 'Recall active dispatch immediately';
+        else if (r.code === 'UNSAFE_ACTIVE_TRIP_SUSPENDED') recommendedAction = 'Recall trip immediately';
+        
+        alertingDrivers.push({
+          id: d.id,
+          name: d.fullName,
+          code: r.code,
+          issue: r.message,
+          severity: r.severity,
+          expiryDate: d.licenseExpiry,
+          safetyScore: score,
+          status: d.status,
+          riskScore: d.riskScore,
+          recommendedAction
+        });
       });
     }
   }
 
+  // Fleet Metrics
   const averageSafetyScore = drivers.length > 0
     ? parseFloat((safetyScoreSum / drivers.length).toFixed(1))
     : 100;
 
+  const validLicenseCount = drivers.filter(d => new Date(d.licenseExpiry) >= now).length;
+  const licenseComplianceRate = drivers.length > 0
+    ? parseFloat(((validLicenseCount / drivers.length) * 100).toFixed(1))
+    : 100;
+
+  const tripsAtRiskCount = evaluatedTrips.filter(t => !t.eligible).length;
+
+  const driversRequiringAction = drivers.filter(d => d.riskLevel === 'CRITICAL' || d.riskLevel === 'HIGH' || d.status === 'suspended').length;
+
   const safetyDistribution = [
-    { name: 'Excellent (>=90)', value: excellentCount, color: '#4CAF50' },
-    { name: 'Good (80-89)', value: goodCount, color: '#FFB300' },
-    { name: 'At Risk (<80)', value: atRiskCount, color: '#F44336' }
+    { name: `Excellent (>=${safetyService.THRESHOLDS.EXCELLENT})`, value: excellentCount, color: '#16a34a' },
+    { name: `Good (${safetyService.THRESHOLDS.GOOD}-${safetyService.THRESHOLDS.EXCELLENT-1})`, value: goodCount, color: '#ca8a04' },
+    { name: `At Risk (${safetyService.THRESHOLDS.HARD_ELIGIBILITY}-${safetyService.THRESHOLDS.GOOD-1})`, value: atRiskCount, color: '#ea580c' },
+    { name: `Critical (<${safetyService.THRESHOLDS.HARD_ELIGIBILITY})`, value: criticalCount, color: '#dc2626' }
   ];
 
   return {
@@ -296,7 +329,10 @@ async function getSafetyOfficerData() {
       expiredLicenses,
       expiringSoonLicenses,
       suspendedDrivers: totalSuspended,
-      totalDrivers: drivers.length
+      totalDrivers: drivers.length,
+      licenseComplianceRate,
+      tripsAtRiskCount,
+      driversRequiringAction
     },
     safetyDistribution,
     alertingDrivers

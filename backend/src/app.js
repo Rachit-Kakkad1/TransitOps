@@ -10,6 +10,7 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth.routes');
 const healthRoutes = require('./routes/health.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const safetyRoutes = require('./routes/safety.routes');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use('/api', healthRoutes);
 app.use('/api', authRoutes);
 app.use('/api', dashboardRoutes);
+app.use('/api', safetyRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -43,8 +43,9 @@ const roleConfig = {
   [ROLES.SAFETY_OFFICER]: {
     title: DISPLAY_NAMES[ROLES.SAFETY_OFFICER],
     sidebarItems: [
-      { path: '/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
-      { path: '/drivers', label: 'Drivers', icon: 'Users' }
+      { path: '/dashboard', label: 'Safety Overview', icon: 'LayoutDashboard' },
+      { path: '/drivers', label: 'Driver Compliance', icon: 'Users' },
+      { path: '/trips', label: 'Trip Safety Engine', icon: 'Truck' }
     ]
   },
   [ROLES.FINANCIAL_ANALYST]: {
