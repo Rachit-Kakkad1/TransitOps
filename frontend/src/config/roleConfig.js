@@ -6,6 +6,7 @@ export const ROLES = {
   DRIVER: 'DRIVER',
   SAFETY_OFFICER: 'SAFETY_OFFICER',
   FINANCIAL_ANALYST: 'FINANCIAL_ANALYST',
+  ADMIN: 'ADMIN',
 };
 
 const DISPLAY_NAMES = {
@@ -14,6 +15,7 @@ const DISPLAY_NAMES = {
   [ROLES.DRIVER]: 'Driver',
   [ROLES.SAFETY_OFFICER]: 'Safety Officer',
   [ROLES.FINANCIAL_ANALYST]: 'Financial Analyst',
+  [ROLES.ADMIN]: 'System Administrator',
 };
 
 const roleConfig = {
@@ -43,15 +45,29 @@ const roleConfig = {
   [ROLES.SAFETY_OFFICER]: {
     title: DISPLAY_NAMES[ROLES.SAFETY_OFFICER],
     sidebarItems: [
-      { path: '/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
-      { path: '/drivers', label: 'Drivers', icon: 'Users' }
+      { path: '/dashboard', label: 'Safety Overview', icon: 'LayoutDashboard' },
+      { path: '/drivers', label: 'Driver Compliance', icon: 'Users' },
+      { path: '/trips', label: 'Trip Safety Engine', icon: 'Truck' }
     ]
   },
   [ROLES.FINANCIAL_ANALYST]: {
     title: DISPLAY_NAMES[ROLES.FINANCIAL_ANALYST],
     sidebarItems: [
       { path: '/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
-      { path: '/analytics', label: 'Expenses & ROI', icon: 'DollarSign' }
+      { path: '/fleet-roi', label: 'Fleet ROI', icon: 'TrendingUp' },
+      { path: '/expenses', label: 'Expenses', icon: 'Receipt' },
+      { path: '/reports', label: 'Reports & Alerts', icon: 'FileBarChart' }
+    ]
+  },
+  [ROLES.ADMIN]: {
+    title: DISPLAY_NAMES[ROLES.ADMIN],
+    sidebarItems: [
+      { path: '/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
+      { path: '/admin/users', label: 'User Management', icon: 'Users' },
+      { path: '/admin/permissions', label: 'Permissions Matrix', icon: 'Shield' },
+      { path: '/admin/audit', label: 'Audit Logging', icon: 'FileText' },
+      { path: '/admin/security', label: 'Security Center', icon: 'Key' },
+      { path: '/admin/settings', label: 'System Settings', icon: 'Settings' }
     ]
   }
 };

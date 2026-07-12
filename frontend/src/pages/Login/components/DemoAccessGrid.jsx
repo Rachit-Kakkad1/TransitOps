@@ -1,11 +1,19 @@
 import { useState } from 'react';
-import { User, Radio, Shield, ChartPie, Truck, Copy, Check } from 'lucide-react';
+import { User, Radio, Shield, ChartPie, Truck, Settings, Copy, Check } from 'lucide-react';
 
 const DEMO_ACCOUNTS = [
   {
+    id: 'admin',
+    role: 'System Admin',
+    email: 'admin@transitops.app',
+    password: 'password123',
+    icon: Settings,
+    color: '#E53935', // Premium red
+  },
+  {
     id: 'manager',
     role: 'Fleet Manager',
-    email: 'manager@transitops.app',
+    email: 'manager@transitops.demo',
     password: 'password123',
     icon: User,
     color: '#1E88E5', // Bright blue
@@ -13,7 +21,7 @@ const DEMO_ACCOUNTS = [
   {
     id: 'dispatcher',
     role: 'Dispatcher',
-    email: 'dispatch@transitops.app',
+    email: 'dispatcher@transitops.demo',
     password: 'password123',
     icon: Radio,
     color: '#4CAF50', // Bright green
@@ -21,7 +29,7 @@ const DEMO_ACCOUNTS = [
   {
     id: 'driver',
     role: 'Driver',
-    email: 'driver@transitops.app',
+    email: 'driver@transitops.demo',
     password: 'password123',
     icon: Truck,
     color: '#FFD54F', // Warm Amber
@@ -29,7 +37,7 @@ const DEMO_ACCOUNTS = [
   {
     id: 'safety',
     role: 'Safety Officer',
-    email: 'safety@transitops.app',
+    email: 'safety@transitops.demo',
     password: 'password123',
     icon: Shield,
     color: '#FF9800', // Bright orange
@@ -37,7 +45,7 @@ const DEMO_ACCOUNTS = [
   {
     id: 'analyst',
     role: 'Financial Analyst',
-    email: 'finance@transitops.app',
+    email: 'analyst@transitops.demo',
     password: 'password123',
     icon: ChartPie,
     color: '#9C27B0', // Bright purple
@@ -90,14 +98,26 @@ export default function DemoAccessGrid({ selectedEmail, onSelectAccount }) {
                 }
               }}
             >
+              {/* Copy Button (absolute top-right) */}
+              <button
+                className={`copy-button-subtle ${isCopied ? 'copied' : ''}`}
+                onClick={(e) => handleCopy(e, account.email, account.id)}
+                title="Copy email address"
+                aria-label={`Copy email for ${account.role}`}
+              >
+                {isCopied ? <Check size={12} /> : <Copy size={12} />}
+              </button>
+
               {/* Card Left: Outline Icon */}
               <div className="demo-card-icon-container">
                 <Icon size={18} strokeWidth={1.5} style={{ color: account.color }} />
               </div>
 
-              {/* Card Center: Role Title */}
+              {/* Card Center: Details */}
               <div className="demo-card-details">
                 <span className="demo-card-role">{account.role}</span>
+                <span className="demo-card-email">{account.email}</span>
+                <span className="use-account-badge">USE ACCOUNT</span>
               </div>
             </div>
           );
