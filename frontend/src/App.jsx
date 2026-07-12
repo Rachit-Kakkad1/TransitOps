@@ -3,6 +3,12 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/Login/LoginPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import Dashboard from './pages/Dashboard/Dashboard';
+
+import Vehicles from './pages/Vehicles/Vehicles';
+import Trips from './pages/Trips/Trips';
+import Maintenance from './pages/Maintenance/Maintenance';
+import Drivers from './pages/Drivers/Drivers';
+
 import AdminControlCenter from './pages/Admin/AdminControlCenter';
 
 // Finance Pages
@@ -21,51 +27,6 @@ function RoleProtectedRoute({ allowedRoles, children }) {
   return children;
 }
 
-function AppRoutes() {
-  return (
-    <Routes>
-      {/* Guest Route */}
-      <Route path="/login" element={<LoginPage />} />
-
-      {/* Protected Dashboard Routes */}
-      <Route element={<DashboardLayout />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        
-        {/* Financial Analyst / Fleet Manager Routes */}
-        <Route path="/fleet-roi" element={
-          <RoleProtectedRoute allowedRoles={['FINANCIAL_ANALYST', 'FLEET_MANAGER']}>
-            <VehicleProfitabilityPage />
-          </RoleProtectedRoute>
-        } />
-        
-        <Route path="/expenses" element={
-          <RoleProtectedRoute allowedRoles={['FINANCIAL_ANALYST', 'FLEET_MANAGER']}>
-            <ExpenseIntelligencePage />
-          </RoleProtectedRoute>
-        } />
-        
-        <Route path="/reports" element={
-          <RoleProtectedRoute allowedRoles={['FINANCIAL_ANALYST', 'FLEET_MANAGER']}>
-            <FinancialReportsPage />
-          </RoleProtectedRoute>
-        } />
-
-        {/* Fallback to dashboard for other sub-routes in shell */}
-        <Route path="/vehicles" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/trips" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/maintenance" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/drivers" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/analytics" element={<Navigate to="/dashboard" replace />} />
-      </Route>
-
-      {/* Root redirect */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      {/* Wildcard fallback */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
-  );
-}
-
 function App() {
   return (
     <AuthProvider>
@@ -77,17 +38,38 @@ function App() {
           {/* Protected Dashboard Routes */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            
+            {/* Admin Routes */}
             <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
             <Route path="/admin/users" element={<AdminControlCenter tab="users" hideTabs={true} />} />
             <Route path="/admin/permissions" element={<AdminControlCenter tab="permissions" hideTabs={true} />} />
             <Route path="/admin/audit" element={<AdminControlCenter tab="audit" hideTabs={true} />} />
             <Route path="/admin/security" element={<AdminControlCenter tab="security" hideTabs={true} />} />
             <Route path="/admin/settings" element={<AdminControlCenter tab="settings" hideTabs={true} />} />
-            {/* Fallback to dashboard for other sub-routes in shell */}
-            <Route path="/vehicles" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/trips" element={<Dashboard />} />
-            <Route path="/maintenance" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/drivers" element={<Dashboard />} />
+
+            {/* Financial Analyst / Fleet Manager Routes */}
+            <Route path="/fleet-roi" element={
+              <RoleProtectedRoute allowedRoles={['FINANCIAL_ANALYST', 'FLEET_MANAGER']}>
+                <VehicleProfitabilityPage />
+              </RoleProtectedRoute>
+            } />
+            <Route path="/expenses" element={
+              <RoleProtectedRoute allowedRoles={['FINANCIAL_ANALYST', 'FLEET_MANAGER']}>
+                <ExpenseIntelligencePage />
+              </RoleProtectedRoute>
+            } />
+            <Route path="/reports" element={
+              <RoleProtectedRoute allowedRoles={['FINANCIAL_ANALYST', 'FLEET_MANAGER']}>
+                <FinancialReportsPage />
+              </RoleProtectedRoute>
+            } />
+
+            {/* Fleet Manager Routes */}
+            <Route path="/vehicles" element={<Vehicles />} />
+            <Route path="/trips" element={<Trips />} />
+            <Route path="/maintenance" element={<Maintenance />} />
+            <Route path="/drivers" element={<Drivers />} />
+            
             <Route path="/analytics" element={<Navigate to="/dashboard" replace />} />
           </Route>
 

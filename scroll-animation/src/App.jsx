@@ -362,8 +362,14 @@ function App() {
               Manage fleets, track shipments in real time, optimize routes with AI, monitor every loading operation, and digitize the complete transport lifecycle from dispatch to delivery.
             </p>
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-              <button className="btn btn-primary">Get Started</button>
+              <button className="btn btn-primary">Sign in</button>
               <button className="btn btn-secondary">Watch Demo</button>
+            </div>
+            
+            {/* Scroll Indicator */}
+            <div className="scroll-indicator" style={{ position: 'fixed', bottom: '40px', left: '50vw', transform: 'translateX(-50%)' }}>
+              <div className="mouse"></div>
+              <p className="scroll-text">Scroll Down</p>
             </div>
           </div>
           
@@ -444,7 +450,7 @@ function App() {
             </div>
             
             <div ref={ch2cardsRef} style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-end' }} className="hide-mobile">
-              <div className="glass-card"><span style={{ color: '#38BDF8' }}>📍</span> GPS Active</div>
+              <div className="glass-card"><span style={{ color: 'var(--accent-color)' }}>📍</span> GPS Active</div>
               <div className="glass-card">
                 <span style={{ color: '#94A3B8', fontSize: '14px', marginRight: '8px' }}>Truck</span> 
                 TRK-102
@@ -548,7 +554,7 @@ function App() {
             
             <div ref={ch3cardsRef} style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'flex-end' }} className="hide-mobile">
               <div className="glass-card"><span style={{ color: '#4ADE80' }}>✔</span> Delivery Completed</div>
-              <div className="glass-card"><span style={{ color: '#38BDF8' }}>📦</span> Cargo Received</div>
+              <div className="glass-card"><span style={{ color: 'var(--accent-color)' }}>📦</span> Cargo Received</div>
               <div className="glass-card"><span style={{ color: '#FBBF24' }}>🕒</span> Arrival Verified</div>
               <div className="glass-card"><span style={{ color: '#A78BFA' }}>✍</span> Digital Signature Captured</div>
             </div>
@@ -575,7 +581,7 @@ function App() {
         </div>
 
         {/* ── Footer ── */}
-        <footer style={{ background: '#0F172A', color: '#fff', padding: '24px 5%', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <footer style={{ background: '#0b1f3a', color: '#fff', padding: '24px 5%', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
             {/* Brand & Copyright */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>

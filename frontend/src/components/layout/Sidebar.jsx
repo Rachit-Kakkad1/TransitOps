@@ -68,17 +68,11 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen, collapsed, 
           minHeight: 64,
           flexShrink: 0
         }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 8,
-            background: '#f97316', // orange accent
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-            color: '#fff',
-            fontWeight: 800,
-            fontSize: '1.1rem'
-          }}>
-            T
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="TransitOps Logo" 
+            style={{ width: 32, height: 32, flexShrink: 0, objectFit: 'contain' }} 
+          />
           {(!collapsed || isMobile) && (
             <span style={{ fontWeight: 800, fontSize: '1.1rem', color: '#0f172a', whiteSpace: 'nowrap' }}>
               Transit<span style={{ color: '#f97316' }}>Ops</span>

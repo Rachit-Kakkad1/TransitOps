@@ -10,6 +10,10 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth.routes');
 const healthRoutes = require('./routes/health.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const vehicleRoutes = require('./routes/vehicle.routes');
+const tripRoutes = require('./routes/trip.routes');
+const maintenanceRoutes = require('./routes/maintenance.routes');
+const driverRoutes = require('./routes/driver.routes');
 const adminRoutes = require('./routes/admin.routes');
 const safetyRoutes = require('./routes/safety.routes');
 
@@ -38,6 +42,10 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use('/api', healthRoutes);
 app.use('/api', authRoutes);
 app.use('/api', dashboardRoutes);
+app.use('/api', vehicleRoutes);
+app.use('/api', tripRoutes);
+app.use('/api', maintenanceRoutes);
+app.use('/api', driverRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', safetyRoutes);
 

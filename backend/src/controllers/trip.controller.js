@@ -1,3 +1,4 @@
+
 const tripService = require('../services/trip.service');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
@@ -169,4 +170,5 @@ module.exports = {
   getPublicTracking,
   getActivePositions,
   createTripExpense
+
 };

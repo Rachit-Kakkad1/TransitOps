@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-blue: #2563EB;
-  --accent-blue: #38BDF8;
+  --primary-color: #f97316;
+  --accent-color: #fb923c;
   --text-white: #FFFFFF;
   --muted-text: #CBD5E1;
-  --bg-overlay: rgba(8,12,24,0.55);
+  --bg-overlay: rgba(11,31,58,0.75); /* Deep navy overlay */
   --glass-border: rgba(255,255,255,0.12);
   --card-bg: rgba(255,255,255,0.08);
   --font-inter: 'Inter', sans-serif;
@@ -99,9 +99,9 @@ html {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   color: var(--text-white);
-  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
+  box-shadow: 0 4px 14px 0 rgba(249, 115, 22, 0.39);
 }
 
 .btn-secondary {
@@ -193,9 +193,9 @@ html {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent-blue);
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: var(--accent-color);
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.3);
   border-radius: 999px;
   margin-bottom: 24px;
   backdrop-filter: blur(4px);
@@ -203,9 +203,9 @@ html {
 }
 
 .badge.dark {
-  color: var(--primary-blue);
-  background: rgba(37, 99, 235, 0.1);
-  border-color: rgba(37, 99, 235, 0.3);
+  color: var(--primary-color);
+  background: rgba(249, 115, 22, 0.1);
+  border-color: rgba(249, 115, 22, 0.3);
 }
 
 .glass-card {
@@ -344,7 +344,7 @@ html {
 .stat-value {
   font-size: 48px;
   font-weight: 700;
-  color: var(--accent-blue);
+  color: var(--accent-color);
   margin-bottom: 12px;
   line-height: 1;
 }
@@ -383,8 +383,8 @@ html {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(56, 189, 248, 0.1);
-  color: var(--accent-blue);
+  background: rgba(249, 115, 22, 0.1);
+  color: var(--accent-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -415,14 +415,14 @@ html {
   pointer-events: none;
   opacity: 0.15;
   background-image: 
-    radial-gradient(circle at 70% 30%, var(--accent-blue) 0%, transparent 40%),
-    radial-gradient(circle at 30% 70%, var(--primary-blue) 0%, transparent 40%);
+    radial-gradient(circle at 70% 30%, var(--accent-color) 0%, transparent 40%),
+    radial-gradient(circle at 30% 70%, var(--primary-color) 0%, transparent 40%);
   filter: blur(40px);
 }
 
 /* ─── Footer & CTA ─── */
 .final-cta {
-  background: #0B1120;
+  background: #0b1f3a; /* Deep navy */
   padding: 120px 5%;
   text-align: center;
   position: relative;
@@ -437,7 +437,7 @@ html {
   transform: translateX(-50%);
   width: 80%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(37,99,235,0.5), transparent);
+  background: linear-gradient(90deg, transparent, rgba(249,115,22,0.5), transparent);
 }
 
 .final-cta-glow {
@@ -447,14 +447,14 @@ html {
   transform: translateX(-50%);
   width: 600px;
   height: 300px;
-  background: var(--primary-blue);
+  background: var(--primary-color);
   filter: blur(150px);
   opacity: 0.15;
   pointer-events: none;
 }
 
 .footer {
-  background: #020617;
+  background: #0b1f3a; /* Deep navy */
   padding: 48px 5% 24px;
   border-top: 1px solid rgba(255,255,255,0.05);
 }
@@ -525,4 +525,57 @@ html {
     gap: 16px;
     text-align: center;
   }
+}
+
+/* ─── Scroll Indicator ─── */
+.scroll-indicator {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 20;
+}
+
+.mouse {
+  width: 26px;
+  height: 40px;
+  border: 2px solid var(--text-white);
+  border-radius: 20px;
+  position: relative;
+}
+
+.mouse::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 8px;
+  background: var(--primary-color);
+  border-radius: 2px;
+  animation: scrollWheel 2s infinite;
+}
+
+@keyframes scrollWheel {
+  0% { transform: translate(-50%, 0); opacity: 1; }
+  100% { transform: translate(-50%, 15px); opacity: 0; }
+}
+
+@keyframes textBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.8; }
+  50% { transform: translateY(4px); opacity: 1; color: var(--primary-color); }
+}
+
+.scroll-text {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-white);
+  font-weight: 600;
+  animation: textBounce 2s ease-in-out infinite;
 }

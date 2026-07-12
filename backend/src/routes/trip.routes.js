@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const ctrl = require('../controllers/trip.controller');
 const authenticate = require('../middleware/authenticate');
+
 const authorize = require('../middleware/authorize');
 
 // Public routes (no auth required)
@@ -19,5 +20,6 @@ router.post('/trips/:id/dispatch', authorize('DISPATCHER', 'FLEET_MANAGER'), ctr
 router.post('/trips/:id/complete', authorize('DISPATCHER', 'FLEET_MANAGER', 'DRIVER'), ctrl.completeTrip);
 router.post('/trips/:id/cancel', authorize('DISPATCHER', 'FLEET_MANAGER'), ctrl.cancelTrip);
 router.post('/trips/:id/expenses', authorize('DISPATCHER', 'DRIVER', 'FLEET_MANAGER'), ctrl.createTripExpense);
+
 
 module.exports = router;
